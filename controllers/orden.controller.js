@@ -1,6 +1,6 @@
 const { response } = require('express');
 const Orden = require('../models/orden');
-const Producto = require('../models/Producto');
+const Producto = require('../models/Producto_Fix');
 
 const crearOrden = async (req, res = response) => {
     const { productos, total, datosEnvio, metodoPago } = req.body;
@@ -18,11 +18,11 @@ const crearOrden = async (req, res = response) => {
         const orden = new Orden(data);
         await orden.save();
 
-        
+
         for (const item of productos) {
             await Producto.findByIdAndUpdate(
-                item.producto, 
-                { $inc: { ventasTotales: item.cantidad } } 
+                item.producto,
+                { $inc: { ventasTotales: item.cantidad } }
             );
         }
 
@@ -43,12 +43,12 @@ const crearOrden = async (req, res = response) => {
 
 const obtenerPedidosPanel = async (req, res = response) => {
     try {
-        const ordenes = await Orden.find({ 
-            estado: { $in: ['PENDIENTE', 'EN_PREPARACION', 'LISTO'] } 
+        const ordenes = await Orden.find({
+            estado: { $in: ['PENDIENTE', 'EN_PREPARACION', 'LISTO'] }
         })
-        .populate('usuario', 'nombre') 
-        .populate('productos.producto', 'nombre imagen') 
-        .sort({ fecha: 1 }); 
+            .populate('usuario', 'nombre')
+            .populate('productos.producto', 'nombre imagen')
+            .sort({ fecha: 1 });
 
         res.json({
             ok: true,
@@ -65,8 +65,8 @@ const actualizarEstadoOrden = async (req, res) => {
 
     try {
         const orden = await Orden.findByIdAndUpdate(
-            id, 
-            { estado }, 
+            id,
+            { estado },
             { new: true }
         ).populate('usuario', 'nombre');
 
@@ -77,7 +77,7 @@ const actualizarEstadoOrden = async (req, res) => {
         if (estado === 'ENTREGADO') {
             const promesasVentas = orden.productos.map(item => {
                 return Producto.findByIdAndUpdate(item.producto, {
-                    $inc: { ventasTotales: item.cantidad } 
+                    $inc: { ventasTotales: item.cantidad }
                 });
             });
 
@@ -113,8 +113,8 @@ const obtenerMisOrdenes = async (req, res) => {
 
     try {
         const ordenes = await Orden.find({ usuario: uid })
-                                   .sort({ fecha: -1 })
-                                   .populate('productos.producto', 'nombre imagen usuariosQueCalificaron'); // <--- AÑADE ESTO AQUÍ
+            .sort({ fecha: -1 })
+            .populate('productos.producto', 'nombre imagen usuariosQueCalificaron'); // <--- AÑADE ESTO AQUÍ
 
         res.json({
             ok: true,
@@ -135,19 +135,19 @@ const obtenerAnalisisTienda = async (req, res) => {
         finHoy.setHours(23, 59, 59, 999);
 
         const ventasHoy = await Orden.aggregate([
-            { 
-                $match: { 
-                    fecha: { $gte: inicioHoy, $lte: finHoy }, 
-                    estado: { $ne: 'CANCELADO' } 
-                } 
+            {
+                $match: {
+                    fecha: { $gte: inicioHoy, $lte: finHoy },
+                    estado: { $ne: 'CANCELADO' }
+                }
             },
             { $unwind: "$productos" },
-            { 
-                $group: { 
-                    _id: null, 
+            {
+                $group: {
+                    _id: null,
                     totalDinero: { $sum: "$total" },
-                   
-                } 
+
+                }
             }
         ]);
 
@@ -175,9 +175,9 @@ const obtenerAnalisisTienda = async (req, res) => {
 
         res.json({
             ok: true,
-            resumenHoy: { 
-                totalDinero: sumaDinero, 
-                cantidadProductos: productosVendidos[0]?.cantidad || 0 
+            resumenHoy: {
+                totalDinero: sumaDinero,
+                cantidadProductos: productosVendidos[0]?.cantidad || 0
             },
             topProductos: productosTop
         });

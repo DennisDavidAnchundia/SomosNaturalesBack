@@ -1,5 +1,5 @@
 // controllers/productos.js
-const Producto = require('../models/Producto');
+const Producto = require('../models/Producto_Fix');
 const cloudinary = require('cloudinary').v2;
 cloudinary.config();
 
@@ -39,7 +39,7 @@ const crearProducto = async (req, res) => {
 const traerProductos = async (req, res) => {
 
     try {
-       const productos = await Producto.find()
+        const productos = await Producto.find()
         res.status(201).json({
             ok: true,
             productos
@@ -75,30 +75,30 @@ const obtenerMejorRating = async (req, res) => {
 };
 
 const calificarProducto = async (req, res) => {
-    const { id } = req.params; 
+    const { id } = req.params;
     const { rating } = req.body;
-    const usuarioId = req.usuario._id; 
+    const usuarioId = req.usuario._id;
     try {
         const producto = await Producto.findById(id);
 
         const yaVoto = producto.usuariosQueCalificaron.some(uid => uid.toString() === usuarioId.toString());
-  if (yaVoto) {
-    return res.status(400).json({ 
-        ok: false, 
-        msg: 'Ya has calificado este producto' 
-    });
-}
+        if (yaVoto) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Ya has calificado este producto'
+            });
+        }
 
         const nuevoNumRevisiones = producto.numRevisiones + 1;
         const nuevoRatingPromedio = ((producto.ratingPromedio * producto.numRevisiones) + rating) / nuevoNumRevisiones;
 
         const productoActualizado = await Producto.findByIdAndUpdate(
-            id, 
-            { 
+            id,
+            {
                 ratingPromedio: nuevoRatingPromedio.toFixed(1),
                 numRevisiones: nuevoNumRevisiones,
-                $push: { usuariosQueCalificaron: usuarioId } 
-            }, 
+                $push: { usuariosQueCalificaron: usuarioId }
+            },
             { new: true }
         );
 
@@ -111,6 +111,6 @@ module.exports = {
     crearProducto,
     traerProductos,
     obtenerMasVendidos,
-    obtenerMejorRating, 
+    obtenerMejorRating,
     calificarProducto
 }
