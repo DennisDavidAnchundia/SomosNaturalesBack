@@ -2,7 +2,7 @@
 const { Router } = require('express');
 const { validarJWT } = require('../middlewares/validar-JWT');
 const { isWorkerRole } = require('../middlewares/isAdminRegister');
-const { crearProducto, traerProductos, obtenerMasVendidos, obtenerMejorRating, calificarProducto } = require('../controllers/producto.controller').default;
+const { crearProducto, traerProductos, obtenerMasVendidos, obtenerMejorRating, calificarProducto } = require('../controllers/producto.controller')
 const { validarCampos } = require('../middlewares/erros.middlewares');
 const { check } = require('express-validator');
 
