@@ -1,5 +1,5 @@
 // controllers/productos.js
-const Producto = require('../models/Producto_Fix');
+const Producto = require('../models/Producto');
 const cloudinary = require('cloudinary').v2;
 cloudinary.config();
 

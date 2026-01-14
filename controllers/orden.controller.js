@@ -1,6 +1,6 @@
 const { response } = require('express');
 const Orden = require('../models/orden');
-const Producto = require('../models/Producto_Fix');
+const Producto = require('../models/Producto');
 
 const crearOrden = async (req, res = response) => {
     const { productos, total, datosEnvio, metodoPago } = req.body;
