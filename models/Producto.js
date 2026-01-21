@@ -10,6 +10,7 @@ const ProductoSchema = Schema({
     ratingPromedio: { type: Number, default: 0 },
     numRevisiones: { type: Number, default: 0 }, 
     usuariosQueCalificaron: [{
+        
     type: Schema.Types.ObjectId,
     ref: 'Usuario'
 }]
