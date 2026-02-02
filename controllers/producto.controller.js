@@ -37,18 +37,20 @@ const crearProducto = async (req, res) => {
     }
 };
 const traerProductos = async (req, res) => {
-
     try {
-        const productos = await Producto.find()
-        res.status(201).json({
+        const productos = await Producto.find();
+        return res.status(200).json({ // Cambiado a 200
             ok: true,
             productos
         });
-
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            ok: false,
+            msg: 'Hable con el administrador'
+        });
     }
-};
+};;
 
 const obtenerMasVendidos = async (req, res) => {
     try {

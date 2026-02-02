@@ -14,6 +14,6 @@ const ProductoSchema = Schema({
     type: Schema.Types.ObjectId,
     ref: 'Usuario'
 }]
-});
+},{ collection: 'productos' });;
 
 module.exports = model('Producto', ProductoSchema);

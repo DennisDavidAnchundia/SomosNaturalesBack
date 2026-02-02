@@ -16,6 +16,7 @@ router.get('/traerProducto', [
     validarJWT,
 ], traerProductos);
 router.get('/TraerProductosHomePublic', [
+    validarJWT
 
 ], traerProductos);
 router.get('/masvendidos', obtenerMasVendidos);
