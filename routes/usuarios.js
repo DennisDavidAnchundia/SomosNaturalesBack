@@ -36,7 +36,6 @@ router.post('/crearUsuario', [
     check('password', 'El password debe ser minimo de 6 caracteres').isLength({ min: 6 }),
     check('correo', 'El correo ingresado no es valido').isEmail(),
     check('correo').custom( existeCorreo ),
-    check('rol').custom( rolValid ),
     validarCampos
 ] ,usuariosPost );
 
