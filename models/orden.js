@@ -59,9 +59,7 @@ const OrdenSchema = Schema({
 
     estado: { 
         type: String, 
-        enum: ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'ENTREGADO', 'CANCELADO'],
-        default: 'PENDIENTE' 
-    }
+enum: ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'EN_CAMINO', 'ENTREGADO', 'PAGADO', 'CANCELADO'],    }
 });
 
 module.exports = model('Orden', OrdenSchema);

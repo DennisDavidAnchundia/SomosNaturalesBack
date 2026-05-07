@@ -44,7 +44,8 @@ const crearOrden = async (req, res = response) => {
 const obtenerPedidosPanel = async (req, res = response) => {
     try {
         const ordenes = await Orden.find({
-            estado: { $in: ['PENDIENTE', 'EN_PREPARACION', 'LISTO'] }
+            // Agregamos EN_CAMINO aquí para que no desaparezca del panel
+            estado: { $in: ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'EN_CAMINO', 'ENTREGADO'] }
         })
             .populate('usuario', 'nombre')
             .populate('productos.producto', 'nombre imagen')
