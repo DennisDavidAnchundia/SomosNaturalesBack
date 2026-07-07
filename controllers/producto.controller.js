@@ -109,10 +109,93 @@ const calificarProducto = async (req, res) => {
         res.status(500).json({ ok: false, msg: 'Error al calificar' });
     }
 };
+
+const actualizarProducto = async (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion, precio } = req.body;
+
+    try {
+        // 1. Verificar si el producto existe
+        let producto = await Producto.findById(id);
+        if (!producto) {
+            return res.status(404).json({ ok: false, msg: 'Producto no encontrado' });
+        }
+
+        // 2. Preparar el objeto con los cambios
+        const cambiosProducto = { nombre, descripcion, precio };
+
+        // 3. Si viene una nueva imagen, procesarla
+        if (req.files && req.files.archivo) {
+            // Si el producto ya tenía una imagen, borrar la anterior de Cloudinary
+            if (producto.imagen) {
+                const nombreArr = producto.imagen.split('/');
+                const nombreArchivo = nombreArr[nombreArr.length - 1];
+                const [publicId] = nombreArchivo.split('.');
+                
+                // Incluimos la ruta de la carpeta si es necesario
+                await cloudinary.uploader.destroy(`restaurante/productos/${publicId}`);
+            }
+
+            // Subir la nueva imagen
+            const { tempFilePath } = req.files.archivo;
+            const { secure_url } = await cloudinary.uploader.upload(tempFilePath, {
+                folder: 'restaurante/productos'
+            });
+            cambiosProducto.imagen = secure_url;
+        }
+
+        // 4. Actualizar en la base de datos
+        const productoActualizado = await Producto.findByIdAndUpdate(id, cambiosProducto, { new: true });
+
+        res.json({
+            ok: true,
+            producto: productoActualizado
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ ok: false, msg: 'Error al actualizar el producto' });
+    }
+};
+
+const eliminarProducto = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // 1. Verificar si el producto existe
+        const producto = await Producto.findById(id);
+        if (!producto) {
+            return res.status(404).json({ ok: false, msg: 'Producto no encontrado' });
+        }
+
+        // 2. Borrar la imagen de Cloudinary si existía
+        if (producto.imagen) {
+            const nombreArr = producto.imagen.split('/');
+            const nombreArchivo = nombreArr[nombreArr.length - 1];
+            const [publicId] = nombreArchivo.split('.');
+            
+            await cloudinary.uploader.destroy(`restaurante/productos/${publicId}`);
+        }
+
+        // 3. Eliminar de la base de datos
+        await Producto.findByIdAndDelete(id);
+
+        res.json({
+            ok: true,
+            msg: 'Producto eliminado correctamente'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ ok: false, msg: 'Error al eliminar el producto' });
+    }
+};
 module.exports = {
     crearProducto,
     traerProductos,
     obtenerMasVendidos,
     obtenerMejorRating,
-    calificarProducto
+    calificarProducto,
+    actualizarProducto,
+    eliminarProducto
 }
